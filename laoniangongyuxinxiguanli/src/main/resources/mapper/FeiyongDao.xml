@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.FeiyongDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.fangjian_name as fangjianName
+        ,a.feiyong_types as feiyongTypes
+        ,a.feiyong as feiyong
+        ,a.feiyong_content as feiyongContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.FeiyongView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM feiyong  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.fangjianName != '' and params.fangjianName != null and params.fangjianName != 'null' ">
+                and a.fangjian_name like CONCAT('%',#{params.fangjianName},'%')
+            </if>
+            <if test="params.feiyongTypes != null and params.feiyongTypes != ''">
+                and a.feiyong_types = #{params.feiyongTypes}
+            </if>
+            <if test="params.feiyongStart != null ">
+                <![CDATA[  and a.feiyong >= #{params.feiyongStart}   ]]>
+            </if>
+            <if test="params.feiyongEnd != null ">
+                <![CDATA[  and a.feiyong <= #{params.feiyongEnd}   ]]>
+            </if>
+            <if test=" params.feiyongContent != '' and params.feiyongContent != null and params.feiyongContent != 'null' ">
+                and a.feiyong_content like CONCAT('%',#{params.feiyongContent},'%')
+            </if>
+
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
